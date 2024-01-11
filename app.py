@@ -173,6 +173,11 @@ def submit_review():
       }
       db.review.insert_one(new_doc)
 
+      db.total.update_one(
+         {'placename':placename},
+         {'$inc':{'reviewcount':1}}
+      )
+
    return jsonify({'result': 'success'})
 
 #[리뷰 노출 API]
