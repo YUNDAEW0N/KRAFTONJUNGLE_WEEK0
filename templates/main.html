@@ -450,7 +450,8 @@
                 data: JSON.stringify({
                     place_name: placename,
                     rating: rating,
-                    comment: comment
+                    comment: comment,
+                    user_nickname: "{{ user_nickname }}"
                 }),
                 contentType: "application/json; charset=utf-8",
                 success: function (response) {
@@ -494,6 +495,7 @@
                                         <div class="card">
                                             <div class="card-content">
                                                 <div>
+                                                <strong>닉네임:</strong>${review.nickname}<br>
                                                 <strong>평점:</strong> ${review.rating}<br>
                                                 <strong>코멘트</strong> <br>
                                                 <div class="comment-box">${review.comment}</div>

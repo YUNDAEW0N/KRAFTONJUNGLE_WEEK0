@@ -46,7 +46,7 @@ def main():
    try:
       payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
       user_info = db.user.find_one({"userId": payload['id']})
-      return render_template('main.html', user_info=user_info)
+      return render_template('main.html', user_info=user_info,user_nickname=user_info.get('nickname',''))
    except jwt.ExpiredSignatureError:
       return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
    except jwt.exceptions.DecodeError:
@@ -149,6 +149,7 @@ def submit_review():
    placename = data.get('place_name')
    rating = data.get('rating')
    comment = data.get('comment')
+   nickname=data.get('user_nickname')
 
    # 음식점이 존재하는지 확인
    existing_doc = db.review.find_one({'placename': placename})
@@ -157,9 +158,7 @@ def submit_review():
       # 음식점이 이미 존재하는 경우, 리뷰 추가
       db.review.update_one(
             {'placename': placename},
-            {'$push': {'reviews': {'rating': rating, 'comment':
-               
-               comment}}}
+            {'$push': {'reviews': {'rating': rating, 'comment':comment,'nickname':nickname}}}
       )
       db.total.update_one(
          {'placename':placename},
@@ -169,7 +168,7 @@ def submit_review():
       # 음식점이 없는 경우, 새로운 도큐먼트 추가
       new_doc = {
             'placename': placename,
-            'reviews': [{'rating': rating, 'comment': comment}]
+            'reviews': [{'rating': rating, 'comment': comment,'nickname':nickname}]
       }
       db.review.insert_one(new_doc)
 
@@ -194,7 +193,8 @@ def fetch_reviews():
         for review in review_doc.get('reviews', []):
             reviews.append({
                 'comment': review.get('comment', ''),
-                'rating': review.get('rating', 0)
+                'rating': review.get('rating', 0),
+                'nickname':review.get('nickname','')
             })
 
     return jsonify(reviews)
